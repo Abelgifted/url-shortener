@@ -1,9 +1,13 @@
+import uuid
+
 from database import *
 
 init_db()
 
+email = f"abel-{uuid.uuid4().hex[:8]}@example.com"
+
 user_id = create_user(
-    "abel@example.com",
+    email,
     "hashed_password"
 )
 

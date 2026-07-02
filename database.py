@@ -152,48 +152,20 @@ def create_url(long_url, user_id=None):
 
 
 def get_url(short_code: str):
-    """
-    Retrieve URL without side effects.
-    """
-
+    """Retrieve URL record without side effects."""
     with get_db() as db:
-
         cursor = db.cursor()
-
-        cursor.execute(
-            """
-            SELECT *
-            FROM urls
-            WHERE short_code = ?
-            """,
-            (short_code,)
-        )
-
+        cursor.execute("SELECT * FROM urls WHERE short_code = ?", (short_code,))
         row = cursor.fetchone()
+        return dict(row) if row else None
 
-        if row is None:
-            return None
 
-        return dict(row)
-    
-
-def increment_click(short_code: str):
-    """
-    Increment click count.
-    Call only when a redirect actually occurs.
-    """
-
+def increment_click(short_code: str) -> None:
+    """Increment click count. Called only by the redirect route."""
     with get_db() as db:
-
-        cursor = db.cursor()
-
-        cursor.execute(
-            """
-            UPDATE urls
-            SET click_count = click_count + 1
-            WHERE short_code = ?
-            """,
-            (short_code,)
+        db.execute(
+            "UPDATE urls SET click_count = click_count + 1 WHERE short_code = ?",
+            (short_code,),
         )
 
 def get_urls_for_user(user_id):
