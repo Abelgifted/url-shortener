@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 from typing import Optional
 
@@ -21,6 +22,8 @@ from database import (
     increment_click,
     init_db,
 )
+
+BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")
 
 app = FastAPI(
     title="URL Shortener API",
@@ -119,7 +122,7 @@ def shorten(
     return URLResponse(
         short_code=short_code,
         long_url=str(request.long_url),
-        short_url=f"http://localhost:8000/{short_code}",
+        short_url=f"{BASE_URL}/{short_code}",
         click_count=url["click_count"],
     )
 
