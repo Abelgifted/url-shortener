@@ -1,10 +1,11 @@
 import os
+from contextlib import asynccontextmanager
 from datetime import datetime
 from typing import Optional
 
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.responses import RedirectResponse
-from pydantic import BaseModel, EmailStr, HttpUrl, validator
+from pydantic import BaseModel, EmailStr, HttpUrl, field_validator
 
 from auth import (
     create_token,
@@ -25,16 +26,19 @@ from database import (
 
 BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_db()
+    yield
+
+
 app = FastAPI(
     title="URL Shortener API",
     description="A professional URL shortening service",
     version="1.0.0",
+    lifespan=lifespan,
 )
-
-
-@app.on_event("startup")
-def startup():
-    init_db()
 
 
 # ------------------------------------------------------------------
@@ -57,7 +61,8 @@ class UserCreate(BaseModel):
     email: EmailStr
     password: str
 
-    @validator("password")
+    @field_validator("password")
+    @classmethod
     def password_min_length(cls, v):
         if len(v) < 8:
             raise ValueError("Password must be at least 8 characters")
