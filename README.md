@@ -4,23 +4,28 @@ A production-inspired URL Shortener REST API built with **FastAPI**, **SQLite**,
 
 ## Features
 
-* User registration
-* Create short URLs
+* User registration and authentication (JWT)
+* Secure password hashing with bcrypt
+* Create short URLs (authenticated and anonymous)
 * Redirect short URLs to their original destinations
-* Track click counts
-* Retrieve URL statistics
+* Track click counts and view statistics
+* User-specific URL management
 * SQLite database with indexed lookups
 * Base62 short code generation
 * Automatic database initialization
 * Interactive API documentation with Swagger UI
+* Comprehensive test coverage
 
 ## Project Structure
 
 ```text
 url-shortener/
-├── database.py        # Database operations
+├── main.py            # FastAPI application and routes
+├── database.py        # Database operations and schema
 ├── models.py          # Base62 encoding/decoding
-├── main.py            # FastAPI application
+├── auth.py            # Authentication and JWT tokens
+├── test_auth.py       # Authentication tests
+├── test_database.py   # Database tests
 ├── requirements.txt
 ├── .gitignore
 └── README.md
@@ -91,19 +96,39 @@ Alternative OpenAPI documentation:
 http://localhost:8000/redoc
 ```
 
+## Live Demo
+
+**API Base URL:**
+```
+https://url-shortener-1xuu.onrender.com
+```
+
+**Swagger Documentation:**
+```
+https://url-shortener-1xuu.onrender.com/docs
+```
+
 ## API Endpoints
+
+### General
+
+| Method | Endpoint | Description                              |
+| ------ | -------- | ---------------------------------------- |
+| GET    | `/`      | API health check and service information |
 
 ### Users
 
-| Method | Endpoint              | Description         |
-| ------ | --------------------- | ------------------- |
+| Method | Endpoint              | Description       |
+| ------ | --------------------- | ----------------- |
 | POST   | `/api/users/register` | Register a new user |
+| POST   | `/api/users/login`    | Login and get JWT token |
 
 ### URLs
 
 | Method | Endpoint                       | Description                  |
 | ------ | ------------------------------ | ---------------------------- |
 | POST   | `/api/urls`                    | Create a short URL           |
+| GET    | `/api/urls`                    | List user's shortened URLs (authenticated) |
 | GET    | `/api/urls/{short_code}/stats` | View URL statistics          |
 | GET    | `/{short_code}`                | Redirect to the original URL |
 
@@ -134,18 +159,28 @@ Each URL stores:
 }
 ```
 
+## Authentication
+
+The API uses JWT (JSON Web Tokens) for authentication. Protected endpoints require a valid token in the `Authorization: Bearer <token>` header.
+
+### Getting a Token
+
+1. Register a user: `POST /api/users/register`
+2. Login with credentials: `POST /api/users/login`
+3. Use the returned `access_token` for authenticated requests
+
 ## Future Improvements
 
-* User login and authentication (JWT)
-* Password hashing with bcrypt
 * Custom short URLs
-* URL expiration
+* URL expiration enforcement
 * QR code generation
 * Rate limiting
 * Redis caching
 * Docker support
-* Automated unit and integration tests
+* Comprehensive integration tests
 * Deployment to a cloud platform
+* Admin dashboard
+* Analytics and reporting
 
 ## License
 
