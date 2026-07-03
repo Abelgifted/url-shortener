@@ -4,7 +4,7 @@ from typing import Optional
 
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.responses import RedirectResponse
-from pydantic import BaseModel, HttpUrl
+from pydantic import BaseModel, EmailStr, HttpUrl, validator
 
 from auth import (
     create_token,
@@ -54,8 +54,14 @@ class URLResponse(BaseModel):
 
 
 class UserCreate(BaseModel):
-    email: str
+    email: EmailStr
     password: str
+
+    @validator("password")
+    def password_min_length(cls, v):
+        if len(v) < 8:
+            raise ValueError("Password must be at least 8 characters")
+        return v
 
 
 class UserResponse(BaseModel):
